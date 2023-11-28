@@ -1,1 +1,15 @@
 # to run backend as service in server
+[Unit]
+ Description=LMS Application
+ After=network.target
+ 
+[Service]
+ ExecStart=/usr/bin/java -jar /home/ubuntu/lms-team-1/LMS-BE/target/LMS-0.0.1-SNAPSHOT.jar
+ Restart=always
+ RestartSec=10
+ User=ubuntu
+ WorkingDirectory=/home/ubuntu/lms-team-1/LMS-BE/target
+ 
+[Install]
+ WantedBy=default.target
+
