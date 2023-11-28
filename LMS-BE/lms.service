@@ -4,7 +4,7 @@
  After=network.target
  
 [Service]
- ExecStart=/usr/bin/java -jar /home/ubuntu/lms-java/LMS-BE/target/LMS-0.0.1-SNAPSHOT.jar
+ ExecStart=/usr/bin/java -jar /home/ubuntu/LMS-BE/target/LMS-0.0.1-SNAPSHOT.jar
  Restart=always
  RestartSec=10
  User=ubuntu
