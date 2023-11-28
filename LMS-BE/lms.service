@@ -11,6 +11,6 @@
  WorkingDirectory=/home/ubuntu/lms-team-1/LMS-BE/target
  
 [Install]
- WantedBy=default.targeT
+ WantedBy=default.target
 
 
