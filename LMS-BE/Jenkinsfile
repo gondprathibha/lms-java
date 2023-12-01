@@ -10,13 +10,13 @@ pipeline {
           }
         stage('Docker build') {
             steps {
-               # sh 'sudo docker rmi -f backend'
+                sh 'sudo docker rmi -f backend'
                 sh 'cd /var/lib/jenkins/workspace/BE-lms/LMS-BE && sudo docker build -t backend .'
             }
           }
         stage('Docker container') {
             steps {
-              #  sh 'sudo docker container rm -f be'
+                sh 'sudo docker container rm -f be'
                 sh 'sudo docker container run -dt --name be -p 8080:8080 backend'
             }
         }
