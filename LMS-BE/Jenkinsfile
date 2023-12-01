@@ -8,9 +8,16 @@ pipeline {
                 sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=P@55word -p 3306:3306 mysql:latest'
              }
           }
+        stage('Remove Existing Backend Image') {
+            steps {
+                script {
+                    sh 'sudo docker rmi -f backend:latest'
+                }
+            }
+        }
         stage('Docker build') {
             steps {
-                sh 'sudo docker rmi -f backend'
+                #sh 'sudo docker rmi -f backend'
                 sh 'cd /var/lib/jenkins/workspace/BE-lms/LMS-BE && sudo docker build -t backend .'
             }
           }
