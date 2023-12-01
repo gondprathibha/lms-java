@@ -1,29 +1,51 @@
 pipeline {
     agent any
-  
-    stages{
-        stage('database container') {
+
+    environment {
+        MYSQL_IMAGE_NAME = 'mysql:latest'
+        CONTAINER_NAME = 'lmsbe'
+    }
+
+    stages {
+        stage('Build MySQL Docker Image') {
             steps {
-                sh 'sudo docker container rm -f mysql'
-                sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=P@55word@123 -p 3306:3306 mysql:latest'
-             }
-          }
-        stage('Docker build') {
-            steps {
-                sh 'sudo docker rmi -f backend'
-                sh 'cd /var/lib/jenkins/workspace/BE-lms/LMS-BE && sudo docker build -t backend .'
-            }
-          }
-        stage('Docker container') {
-            steps {
-                sh 'sudo docker container rm -f be'
-                sh 'sudo docker container run -dt --name be -p 8080:8080 backend'
+                script {
+                    // Check if the Docker image already exists
+                    def imageExists = sh(script: "docker image ls -q ${MYSQL_IMAGE_NAME}", returnStatus: true) == 0
+
+                    if (!imageExists) {
+                        // Build the Docker image if it doesn't exist
+                        sh "docker build -t ${MYSQL_IMAGE_NAME} -f Dockerfile.mysql ."
+                    } else {
+                        echo "Docker image ${MYSQL_IMAGE_NAME} already exists. Skipping the build."
+                    }
+                }
             }
         }
-        stage('Docker') {
+
+        stage('Run Docker Container') {
             steps {
-                sh 'echo deployment done'
-               }
-          }
+                script {
+                    // Check if the Docker container is already running
+                    def containerRunning = sh(script: "docker ps -q --filter name=${CONTAINER_NAME}", returnStatus: true) == 0
+
+                    if (!containerRunning) {
+                        // Run the Docker container if it's not already running
+                        sh "docker run --name ${CONTAINER_NAME} -d -p 3306:3306 ${MYSQL_IMAGE_NAME}"
+                    } else {
+                        echo "Docker container ${CONTAINER_NAME} is already running. Skipping container creation."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Docker image and container setup completed successfully."
+        }
+        failure {
+            echo "Docker image and container setup failed."
+        }
     }
 }
