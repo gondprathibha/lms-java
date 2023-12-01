@@ -5,7 +5,7 @@ pipeline {
         stage('database container') {
             steps {
                 sh 'sudo docker container rm -f mysql'
-                sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=Abc@123 -p 3306:3306 mysql:latest'
+                sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=P@55word@123 -p 3306:3306 mysql:latest'
              }
           }
         stage('Docker build') {
