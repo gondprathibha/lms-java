@@ -1,28 +1,48 @@
 pipeline {
     agent any
 
+    environment {
+        MYSQL_ROOT_PASSWORD = 'P@55word'
+    }
+
     stages {
-        stage('Build MySQL Docker Image') {
+        stage('Build Backend Docker Image') {
             steps {
                 script {
-                    // Build MySQL Docker image
-                    docker.build('mysql', '-f lms-be .')
+                    // Change to the backend directory
+                    dir('/var/lib/jenkins/workspace/BE-lms/LMS-BE') {
+                        // Build Docker image for the backend
+                        sh 'docker build -t backend-image .'
+                    }
                 }
             }
         }
 
-        stage('Create MySQL Container') {
+        stage('Run MySQL Container') {
             steps {
                 script {
-                    def mysqlContainerExists = sh(script: 'docker ps -a --format "{{.Names}}" | grep -q "mysql1"', returnStatus: true)
-
-                    if (mysqlContainerExists == 0) {
-                        echo "MySQL container 'mysql1' already exists. Skipping container creation."
-                    } else {
-                        // Create MySQL Docker container
-                        docker.image('lms-be').withRun('-d --name mysql1 -e MYSQL_ROOT_PASSWORD=P@55word')
-                    }
+                    // Run MySQL Docker container
+                    sh "docker run -d --name mysql-container -p 3036:3036 -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} mysql:latest"
                 }
+            }
+        }
+
+        stage('Run Backend Container') {
+            steps {
+                script {
+                    // Run Backend Docker container
+                    sh 'docker run -d --name backend-container -p 8080:8080 --link mysql-container:mysql backend-image'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup: Stop and remove containers
+            script {
+                sh 'docker stop backend-container mysql-container'
+                sh 'docker rm backend-container mysql-container'
             }
         }
     }
