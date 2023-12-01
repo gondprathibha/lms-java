@@ -37,5 +37,26 @@ pipeline {
                 }
             }
         }
+         stage('Run Docker Container') {
+            steps {
+                script {
+                    // Check if the Docker container already exists
+                    def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q lms-be1", returnStatus: true)
+
+                    if (containerExists == 0) {
+                        // Container exists, stop and remove it
+                        sh "docker stop lms-be1"
+                        sh "docker rm lms-be1"
+                    } else {
+                        echo "No existing container found. Proceeding with the pipeline."
+                    }
+
+                    // Run the Docker container
+                    sh "docker run -d --name lms-be1 -p 8080:8080 be"
+                }
+            }
+        }
+    }
+
 }
-}
+
