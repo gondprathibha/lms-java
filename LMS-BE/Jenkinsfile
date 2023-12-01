@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Build MySQL Docker image
-                    docker.build('custom-mysql-image', '-f Dockerfile-mysql .')
+                    docker.build('mysql', '-f lms-be .')
                 }
             }
         }
@@ -20,7 +20,7 @@ pipeline {
                         echo "MySQL container 'mysql1' already exists. Skipping container creation."
                     } else {
                         // Create MySQL Docker container
-                        docker.image('custom-mysql-image').withRun('-d --name mysql1 -e MYSQL_ROOT_PASSWORD=P@55word')
+                        docker.image('lms-be').withRun('-d --name mysql1 -e MYSQL_ROOT_PASSWORD=P@55word')
                     }
                 }
             }
