@@ -1,49 +1,29 @@
 pipeline {
     agent any
-
-    environment {
-        MYSQL_ROOT_PASSWORD = 'P@55word'
-    }
-
-    stages {
-        stage('Build Backend Docker Image') {
+  
+    stages{
+        stage('database container') {
             steps {
-                script {
-                    // Change to the backend directory
-                    dir('/var/lib/jenkins/workspace/BE-lms/LMS-BE') {
-                        // Build Docker image for the backend
-                        sh 'docker build -t backend-image .'
-                    }
-                }
-            }
-        }
-
-        stage('Run MySQL Container') {
+                sh 'sudo docker container rm -f mysql'
+                sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=P@55word -p 3306:3306 mysql:latest'
+             }
+          }
+        stage('Docker build') {
             steps {
-                script {
-                    // Run MySQL Docker container
-                    sh "docker run -d --name mysql-container -p 3036:3036 -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} mysql:latest"
-                }
+                sh 'sudo docker rmi -f backend'
+                sh 'cd /var/lib/jenkins/workspace/BE-lms/LMS-BE && sudo docker build -t backend .'
             }
-        }
-
-        stage('Run Backend Container') {
+          }
+        stage('Docker container') {
             steps {
-                script {
-                    // Run Backend Docker container
-                    sh 'docker run -d --name backend-container -p 8080:8080 --link mysql-container:mysql backend-image'
-                }
+                sh 'sudo docker container rm -f be'
+                sh 'sudo docker container run -dt --name be -p 8080:8080 backend'
             }
         }
-    }
-
-    post {
-        always {
-            // Cleanup: Stop and remove containers
-            script {
-                sh 'docker stop backend-container mysql-container'
-                sh 'docker rm backend-container mysql-container'
-            }
-        }
+        stage('Docker') {
+            steps {
+                sh 'echo deployment done'
+               }
+          }
     }
 }
