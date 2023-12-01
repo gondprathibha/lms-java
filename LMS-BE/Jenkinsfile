@@ -1,36 +1,14 @@
 pipeline {
     agent any
-  
-    stages{
-        stage('database container') {
-            steps {
-                sh 'sudo docker container rm -f mysql'
-                sh 'sudo docker container run -d --name mysql -e MYSQL_ROOT_PASSWORD=P@55word -p 3306:3306 mysql:latest'
-             }
-          }
-        stage('Remove Existing Backend Image') {
+  stage('Check Docker Network') {
             steps {
                 script {
-                    sh 'sudo docker rmi -f backend:latest'
+                    def networkExists = sh(script: 'docker network inspect lmsnetwork > /dev/null 2>&1', returnStatus: true)
+                    if (networkExists == 0) {
+                        echo 'Docker network lmsnetwork already exists'
+                    } else {
+                        sh 'docker network create -d bridge lmsnetwork'
+                    }
                 }
             }
         }
-        stage('Docker build') {
-            steps {
-                #sh 'sudo docker rmi -f backend'
-                sh 'cd /lms-java/LMS-BE && sudo docker build -t backend .'
-            }
-          }
-        stage('Docker container') {
-            steps {
-                sh 'sudo docker container rm -f be'
-                sh 'sudo docker container run -dt --name be -p 8080:8080 backend'
-            }
-        }
-        stage('Docker') {
-            steps {
-                sh 'echo deployment done'
-               }
-          }
-    }
-}
