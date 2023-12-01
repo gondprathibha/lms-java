@@ -1,6 +1,6 @@
 pipeline {
     agent any
-        
+    stages{
   stage('Check Docker Network') {
             steps {
                 script {
@@ -13,4 +13,5 @@ pipeline {
                 }
             }
         }
+}
 }
