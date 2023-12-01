@@ -32,7 +32,7 @@ pipeline {
                     // Change to the backend directory
                     dir('/var/lib/jenkins/workspace/BE-lms/LMS-BE') {
                         // Build Docker image for the backend
-                        sh 'docker build -t BE .'
+                        sh 'docker build -t be .'
                     }
                 }
             }
