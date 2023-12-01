@@ -1,51 +1,29 @@
 pipeline {
     agent any
 
-    environment {
-        MYSQL_IMAGE_NAME = 'mysql:latest'
-        CONTAINER_NAME = 'lmsbe'
-    }
-
     stages {
         stage('Build MySQL Docker Image') {
             steps {
                 script {
-                    // Check if the Docker image already exists
-                    def imageExists = sh(script: "docker image ls -q ${MYSQL_IMAGE_NAME}", returnStatus: true) == 0
-
-                    if (!imageExists) {
-                        // Build the Docker image if it doesn't exist
-                        sh "docker build -t ${MYSQL_IMAGE_NAME} -f Dockerfile.mysql ."
-                    } else {
-                        echo "Docker image ${MYSQL_IMAGE_NAME} already exists. Skipping the build."
-                    }
+                    // Build MySQL Docker image
+                    docker.build('custom-mysql-image', '-f Dockerfile-mysql .')
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Create MySQL Container') {
             steps {
                 script {
-                    // Check if the Docker container is already running
-                    def containerRunning = sh(script: "docker ps -q --filter name=${CONTAINER_NAME}", returnStatus: true) == 0
+                    def mysqlContainerExists = sh(script: 'docker ps -a --format "{{.Names}}" | grep -q "mysql1"', returnStatus: true)
 
-                    if (!containerRunning) {
-                        // Run the Docker container if it's not already running
-                        sh "docker run --name ${CONTAINER_NAME} -d -p 3306:3306 ${MYSQL_IMAGE_NAME}"
+                    if (mysqlContainerExists == 0) {
+                        echo "MySQL container 'mysql1' already exists. Skipping container creation."
                     } else {
-                        echo "Docker container ${CONTAINER_NAME} is already running. Skipping container creation."
+                        // Create MySQL Docker container
+                        docker.image('custom-mysql-image').withRun('-d --name mysql1 -e MYSQL_ROOT_PASSWORD=P@55word')
                     }
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Docker image and container setup completed successfully."
-        }
-        failure {
-            echo "Docker image and container setup failed."
         }
     }
 }
