@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Build Docker image
+                    docker.build('fe')
+                }
+            }
+        }
+
+        stage('Run') {
+            steps {
+                script {
+                    // Run Docker container
+                    docker.image('fe').run('-p 8080:3000 -d')
+                }
+            }
+        }
+    }
