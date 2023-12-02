@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'cd lmsv1 && docker build -t fe .'
+                sh 'cd lms-fe/lmsv1 && docker build -t fe .'
                 }
             }
         stage('Run') {
