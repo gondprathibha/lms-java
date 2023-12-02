@@ -7,7 +7,6 @@ pipeline {
                 }
             }
         }
-
         stage('Run') {
             steps {
                  sh 'docker run -d --name lms-fe -p 8080:8080 fe'
