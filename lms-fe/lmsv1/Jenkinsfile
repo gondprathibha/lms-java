@@ -10,10 +10,7 @@ pipeline {
 
         stage('Run') {
             steps {
-                script {
-                    // Run Docker container
-                    docker.image('fe').run('-p 8080:3000 -d')
-                }
+                 sh 'docker run -d --name lms-fe -p 8080:8080 fe'
             }
         }
     }
