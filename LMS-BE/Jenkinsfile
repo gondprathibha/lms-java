@@ -28,13 +28,7 @@ pipeline {
 
         stage('Build Backend Docker Image') {
             steps {
-                script {
-                    // Change to the backend directory
-                    dir('/var/lib/jenkins/workspace/BE-lms/LMS-BE') {
-                        // Build Docker image for the backend
-                        sh 'docker build -t be1 .'
-                    }
-                }
+                sh 'cd LMS-BE && docker build -t be1 .'
             }
         }
          stage('Run Docker Container') {
