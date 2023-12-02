@@ -1,12 +1,9 @@
 pipeline {
     agent any
-
     stages {
         stage('Build') {
             steps {
-                script {
-                    // Build Docker image
-                    docker.build('fe')
+                sh 'cd lmsv1 && docker build -t fe .'
                 }
             }
         }
