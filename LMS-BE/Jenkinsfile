@@ -30,7 +30,7 @@ pipeline {
                 slackSend(
                     color: '#36a64f',
                     message: "Build successful! :white_check_mark:",
-                    channel: '#general'
+                    channel: '#testing_slack'
                 )
             }
     }
