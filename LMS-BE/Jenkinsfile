@@ -21,10 +21,18 @@ pipeline {
                     }
 
                     // Run the Docker container
-                    sh "docker run -d --name lms-be1 -p 8081:8080 be1"
+                    sh "docker run -d --name lms-be -p 8081:8080 be1"
                 }
             }
         }
+           stage('Notify Slack') {
+            steps {
+                slackSend(
+                    color: '#36a64f',
+                    message: "Build successful! :white_check_mark:",
+                    channel: '#general'
+                )
+            }
     }
 
 }
