@@ -1,38 +1,29 @@
 pipeline {
     agent any
     stages{
+        stage('Remove Docker Container') {
+            steps {
+                sh 'docker container rm -f be' 
+            }
+        }
         stage('Build Backend Docker Image') {
             steps {
                 sh 'cd LMS-BE && docker build -t be1 .'
             }
         }
-         stage('Run Docker Container') {
-            steps {
-                script {
-                    // Check if the Docker container already exists
-                    def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q lms-be1", returnStatus: true)
-
-                    if (containerExists == 0) {
-                        // Container exists, stop and remove it
-                        sh "docker stop lms-be1"
-                        sh "docker rm lms-be1"
-                    } else {
-                        echo "No existing container found. Proceeding with the pipeline."
-                    }
-
-                    // Run the Docker container
-                    sh "docker run -d --name lms-be1 -p 8081:8080 be1"
-                }
+        stage('run docker container'){
+            step{
+                sh 'docker run -d --name be -p 8081:8080 be1' 
             }
         }
-           stage('Notify Slack') {
+        stage('Notify Slack') {
             steps {
                 slackSend(
                     color: '#36a64f',
                     message: "Build successful! :white_check_mark:",
                     channel: '#testing_slack'
-                )
+                ) 
             }
+        }
     }
-}
 }
