@@ -1,6 +1,11 @@
 pipeline {
     agent any
     stages {
+        stage('remove docker container'){
+            steps{
+                sh 'docker rm -f lmsfe2'
+            }
+        }
         stage('Build') {
             steps {
                 sh 'cd lms-fe/lmsv1 && docker build -t fe .'
