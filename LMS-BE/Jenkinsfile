@@ -21,7 +21,7 @@ pipeline {
                     }
 
                     // Run the Docker container
-                    sh "docker run -d --name lms-be -p 8081:8080 be1"
+                    sh "docker run -d --name lms-be1 -p 8081:8080 be1"
                 }
             }
         }
